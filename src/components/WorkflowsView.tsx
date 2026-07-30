@@ -13,7 +13,8 @@ import {
   Code,
   Calendar,
   MousePointerClick,
-  Clock
+  Clock,
+  Settings
 } from 'lucide-react';
 
 interface WorkflowsViewProps {

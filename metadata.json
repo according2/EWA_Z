@@ -1,0 +1,6 @@
+{
+  "name": "Zoho Payroll Myanmar",
+  "description": "A high-fidelity Zoho Payroll front-end UI prototype customized for Myanmar enterprises. Showcases all 14 core modules, featuring fully localized Kyat (Ks) denominations, Ministry of Labour & SSB statutory deductions, digital agreement signature pads, and monthly PIT/SSB filing schedules.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

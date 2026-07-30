@@ -1,0 +1,488 @@
+# Enterprise Payroll SaaS — Frontend Demo Prototype
+# Reference: Zoho Payroll
+
+---
+
+## 1. Project Scope Overview
+
+This document defines the full scope and feature details for an enterprise-grade payroll SaaS frontend demo prototype comprising **277 interactive screens** across **14 functional modules**. The prototype is designed as a fully navigable, clickable demo with realistic mock data, interactive forms, approval flows, charts, drawers, and modal dialogs — delivering a near-production experience prior to backend integration.
+
+| Attribute | Detail |
+|---|---|
+| **Prototype Type** | Clickable Frontend Demo (No Backend) |
+| **Total Screens** | 277 |
+| **Total Modules** | 14 |
+| **Target Audience** | Enterprise HR, Finance, Payroll, and Operations teams |
+| **Reference Architecture** | Zoho Payroll, modern SaaS payroll platforms |
+| **Data Mode** | Realistic Mock Data |
+| **Interaction Model** | Full navigation, forms, modals, drawers, approval flows, charts |
+
+---
+
+## 2. Scope Boundaries
+
+### In Scope
+- All 277 screens across 14 modules with full UI navigation
+- Realistic mock data for all entities (employees, payroll runs, EWA transactions, loans, reports)
+- Interactive forms with field-level validation states (success, error, warning)
+- Multi-step wizards with step indicators and back/next navigation
+- Approval flows with multi-level states (Pending → Approved → Rejected → Escalated)
+- Charts and analytics with mock datasets (bar, line, pie, heatmap, trend)
+- Responsive layout (desktop-first, tablet-aware)
+- Role-based UI states (Admin, HR Manager, Finance, Employee, Approver)
+- Modals, drawers, tooltips, and contextual help panels
+- Export/download button states (PDF, Excel, CSV)
+- Notification and alert components
+
+### Out of Scope
+- Live backend API integration (deferred to Phase 2)
+- Real payment processing or banking connectivity
+- Production-grade authentication (SSO/MFA simulated only)
+- Real-time data synchronization
+- Mobile native app (web-responsive only)
+
+---
+
+## 3. Module-by-Module Feature Details
+
+---
+
+### Module 1 — Authentication (8 Screens)
+
+**Purpose:** Secure entry point and first-time onboarding experience.
+
+| Screen | Key Features |
+|---|---|
+| **Landing Page** | Hero banner with product value proposition; feature highlights (Payroll, EWA, Loans, Compliance); pricing tiers; customer logo strip; Request Demo CTA; Login button |
+| **Login** | Email + password fields; Remember Me toggle; SSO button (Google/Microsoft); MFA trigger; error states (invalid credentials, account locked) |
+| **Register** | Company name, admin email, password, country selector; terms acceptance; email verification trigger |
+| **Forgot Password** | Email input; success/error states; resend link timer |
+| **OTP Verification** | 6-digit OTP input; countdown timer; resend OTP; masked email/phone display |
+| **Reset Password** | New password + confirm; strength indicator; success redirect |
+| **Select Organization** | Multi-org card grid; last-login badge; search; create new org option |
+| **First-Time Setup Wizard** | 6-step guided setup: Company Info → Country/Currency → Payroll Calendar → Tax → Bank → Finish; progress bar; skip option |
+
+**Feature Highlights:**
+- MFA simulation with OTP flow
+- Multi-organization switcher (critical for enterprise clients managing multiple entities)
+- Guided first-time setup reduces time-to-first-payroll
+
+---
+
+### Module 2 — Main Dashboard (12 Screens)
+
+**Purpose:** Command center providing real-time operational visibility across all modules.
+
+**Dashboard Home Widgets:**
+
+| Widget | Data Displayed |
+|---|---|
+| Payroll Cost | Current cycle total cost vs. prior cycle; % change |
+| Employees | Active / On Leave / Terminated headcount |
+| Today's Attendance | Present / Absent / Late / WFH counts |
+| Upcoming Payroll | Days to next payroll run; cycle name |
+| EWA Available | Total available earned wages across workforce |
+| Pending Approvals | Count by type (Leave, Loan, EWA, Payroll) |
+| Leave Requests | Pending / Approved / Rejected this week |
+| Loans | Outstanding balance; active loan count |
+| Notifications | Unread alerts with severity badges |
+| Tasks | Assigned to-dos with due dates |
+| Calendar | Mini calendar with payroll and holiday markers |
+| Activity Feed | Timestamped audit trail of recent system actions |
+
+**Quick Action Buttons:** Run Payroll, Add Employee, Create Company, Approve Requests, Generate Reports
+
+**Charts:**
+- Payroll Trend (12-month line chart)
+- Headcount Growth (bar chart)
+- Department Cost Breakdown (stacked bar)
+- EWA Usage Rate (area chart)
+- Salary Distribution (histogram)
+- Attendance Trend (line chart)
+
+**Dashboard Details Screens:**
+- Payroll Summary drill-down with component breakdown
+- Employee Summary with status distribution
+- Compliance Status with country-specific checklist
+- Tax Summary with YTD figures
+- Bank Payment Status (Pending / Sent / Failed / Returned)
+- Recent Activities log with filter
+- Audit Timeline with actor, action, timestamp
+- KPI Drill-down with target vs. actual
+- Custom Widgets builder (drag-and-drop)
+- Saved Dashboard configurations
+- Dashboard Settings (widget visibility, layout)
+- Export Dashboard (PDF snapshot)
+
+---
+
+### Module 3 — Organization Module (18 Screens)
+
+**Purpose:** Multi-entity company structure management — the foundational configuration layer.
+
+**Company List:**
+- Search by company name, country, status
+- Filter by active/inactive, country, currency
+- Card view and table view toggle
+- Multi-company badge indicators
+- Quick actions: Edit, View, Deactivate
+
+**Company Details (Tabbed):**
+
+| Tab | Content |
+|---|---|
+| Overview | Company summary card; key stats; recent activity |
+| Profile | Legal name, registration number, address, contact |
+| Tax | Tax ID, filing frequency, tax authority, exemptions |
+| Payroll | Default payroll calendar, pay frequency, currency |
+| Banking | Bank accounts, payment methods, bank file format |
+| Branding | Logo upload, color theme, email header |
+| Documents | Uploaded company documents with version history |
+| Audit | Full change log with actor and timestamp |
+
+**Create Company Wizard (7 Steps):**
+Step 1: Company Info → Step 2: Country → Step 3: Currency → Step 4: Payroll Calendar → Step 5: Tax Setup → Step 6: Bank → Step 7: Finish
+
+**Organizational Structure Screens:**
+
+| Screen | Features |
+|---|---|
+| Branches | List, create, edit branch locations; map view |
+| Departments | Hierarchy tree; parent-child relationships; head assignment |
+| Teams | Team roster; team lead; cross-department teams |
+| Cost Centers | GL code mapping; budget allocation |
+| Job Grades | Grade bands; salary range per grade |
+| Designations | Title library; grade linkage |
+| Holiday Calendar | Country-specific; custom holidays; recurring rules |
+| Working Calendar | Shift patterns; working days configuration |
+| Payroll Calendar | Pay periods; cut-off dates; processing dates |
+| Organization Policies | Policy library with effective dates |
+| Approval Matrix | Multi-level approval chains per action type |
+| Business Units | BU hierarchy; P&L ownership |
+| Locations | Office locations; timezone assignment |
+| Company Documents | Document vault with category tags |
+| Audit History | Full org-level audit trail |
+
+---
+
+### Module 4 — Employee Module (30 Screens)
+
+**Purpose:** Complete employee lifecycle management from hire to exit.
+
+**Employee Directory:**
+- Grid view (photo cards) and table view toggle
+- Advanced search: name, ID, department, grade, status, location
+- Quick filters: Active, On Leave, Probation, Terminated
+- Bulk actions: Export, Edit, Transfer, Terminate
+- Import via CSV/Excel with field mapping wizard
+
+**Employee Profile (Tabbed — 13 Tabs):**
+
+| Tab | Key Fields |
+|---|---|
+| Overview | Summary card; employment snapshot; salary band; manager; timeline |
+| Personal | Full name; DOB; gender; nationality; NRC/passport; address |
+| Family | Spouse, dependents, beneficiaries |
+| Emergency Contact | Name, relationship, phone |
+| Employment | Position; department; grade; location; employment type; start date; probation end |
+| Payroll | Base salary; components breakdown; pay history table; tax details |
+| Attendance | Monthly attendance calendar; late/absent summary |
+| Leave | Leave balance by type; request history; approval status |
+| Loans | Active loans; installment schedule; outstanding balance |
+| EWA | Available earned wage; withdrawal history; fee summary |
+| Benefits | Enrolled benefits; coverage details |
+| Assets | Assigned assets with serial numbers |
+| Documents | Employee document vault; upload; e-sign status |
+| Performance | Review cycles; ratings; goals |
+| Activity | Full audit trail of changes to this employee record |
+
+**Employee Lifecycle Screens:**
+
+| Screen | Features |
+|---|---|
+| New Employee Wizard | 5-step: Personal → Employment → Payroll → Documents → Finish |
+| Employee Import | CSV upload; column mapping; validation report; error rows |
+| Employee Export | Field selector; format (CSV/Excel/PDF); filter scope |
+| Employee Transfer | From/To department, location, cost center; effective date |
+| Promotion | New designation, grade, salary; approval trigger |
+| Salary Revision | Old vs. new salary; effective date; reason; approval chain |
+| Exit Management | Resignation/termination form; notice period; clearance checklist |
+| Termination | Reason codes; last working day; final settlement trigger |
+| Final Settlement | Earned leave encashment; outstanding deductions; net payable |
+| Rehire | Previous record linkage; new start date; gap explanation |
+
+---
+
+### Module 5 — Payroll Module (35 Screens)
+
+**Purpose:** End-to-end payroll processing engine — the core revenue-generating module.
+
+**Payroll Dashboard Widgets:**
+
+| Widget | States |
+|---|---|
+| Current Cycle | Period name; start/end dates; status badge |
+| Draft Payroll | Count of payrolls in draft |
+| Approved | Count approved and awaiting payment |
+| Paid | Count successfully disbursed |
+| Failed | Count with payment errors |
+| Pending Validation | Count with validation warnings |
+
+**Payroll Run Wizard (10 Steps):**
+
+| Step | Actions |
+|---|---|
+| 1. Select Company | Multi-company selector; entity confirmation |
+| 2. Payroll Period | Month/year picker; pay frequency confirmation |
+| 3. Attendance | Import attendance data; review exceptions |
+| 4. Salary Calculation | Auto-calculate; component breakdown preview |
+| 5. Validation | Error/warning list; fix-in-place capability |
+| 6. Preview | Full payroll register with per-employee breakdown |
+| 7. Approval | Submit for approval; approver notification |
+| 8. Generate Payslip | Bulk payslip generation; preview individual |
+| 9. Bank File | Generate bank payment file (SWIFT/local format) |
+| 10. Complete | Payroll locked; disbursement confirmed |
+
+**Additional Payroll Screens:**
+
+| Screen | Features |
+|---|---|
+| Payroll Calendar | Visual calendar of all pay cycles; status color coding |
+| Pay Runs | Historical list with status, total cost, employee count |
+| Payroll Preview | Full register table; sortable; exportable |
+| Payroll Comparison | Side-by-side current vs. prior cycle variance |
+| Salary Components | Component library: earnings, deductions, benefits |
+| Earnings | Configurable earning types (basic, allowances, bonuses) |
+| Deductions | Statutory and voluntary deductions with formula builder |
+| Benefits | Benefit plans with employer/employee contribution split |
+| Bonuses | One-time and recurring bonus management |
+| Overtime | OT rate configuration; hours import; calculation preview |
+| Retro Payroll | Back-dated salary adjustments with period selection |
+| Arrears | Arrear calculation and inclusion in current cycle |
+| Off-cycle Payroll | Ad-hoc payroll runs outside regular schedule |
+| Payroll Lock | Lock/unlock controls with audit trail |
+| Payroll Reversal | Reverse a completed payroll with reason and re-run |
+| Payslip Viewer | Individual payslip with download/email/print |
+| Payroll Audit | Change log for every payroll action |
+| Payroll Journal | GL journal entries per payroll run |
+| Payment Batch | Batch payment grouping by bank/currency |
+| Bank Export | Bank file download in configurable format |
+| GL Export | Accounting system export (CSV/XML) |
+
+---
+
+### Module 6 — Leave & Attendance (20 Screens)
+
+**Purpose:** Workforce time management covering attendance tracking, shift planning, and leave administration.
+
+| Screen | Key Features |
+|---|---|
+| Attendance Dashboard | Daily summary widgets; present/absent/late/WFH counts; trend chart |
+| Attendance Calendar | Monthly calendar view; color-coded attendance status per employee |
+| Shift Planner | Drag-and-drop shift assignment; shift templates |
+| Roster | Weekly/monthly roster grid; bulk assignment |
+| Clock Records | In/out timestamps; device/location source; manual correction |
+| Attendance Approval | Manager approval queue for manual corrections |
+| Leave Dashboard | Leave balance summary; pending requests; upcoming leaves |
+| Leave Calendar | Team leave calendar; conflict detection |
+| Leave Balance | Per-employee balance by leave type; accrual history |
+| Leave Request | Request form with date picker; reason; attachment; balance check |
+| Leave Approval | Multi-level approval with comment thread |
+| Leave Policies | Leave type configuration; accrual rules; carry-forward rules |
+| Holiday Calendar | Public holidays by country/location; custom additions |
+| Timesheets | Weekly timesheet entry; project/task allocation |
+| Attendance Analytics | Trend analysis; department comparison; late pattern detection |
+| Late Tracking | Late arrival log; threshold alerts; escalation rules |
+| Overtime | OT request and approval; OT hours summary |
+| Work From Home | WFH request and approval; WFH policy limits |
+| Remote Attendance | Geo-fenced clock-in; selfie verification state |
+| Attendance Reports | Configurable reports with filter, group-by, export |
+
+---
+
+### Module 7 — EWA Module (25 Screens) ⭐ Centerpiece
+
+**Purpose:** Earned Wage Access — the flagship differentiator enabling employees to access earned wages before payday.
+
+**EWA Dashboard:**
+
+| Widget | Data |
+|---|---|
+| Available Earned Wage | Total accrued but undrawn wages across workforce |
+| Withdrawn Amount | Total disbursed in current cycle |
+| Remaining Balance | Available minus withdrawn |
+| Employer Exposure | Total outstanding EWA liability |
+| Settlement Progress | % of cycle settled; days to payroll deduction |
+| Wallet Balance | Funding wallet available balance |
+
+**Employee Portal Screens:**
+
+| Screen | Features |
+|---|---|
+| Available Balance | Real-time earned wage calculation; accrual breakdown |
+| Request Advance | Amount slider; fee preview; net receive amount; confirm |
+| Slider | Interactive slider with dynamic fee and net amount update |
+| Fee Calculator | Fee structure display; flat vs. % fee toggle |
+| Instant Preview | Confirmation screen before submission |
+
+**Admin Screens:**
+
+| Screen | Features |
+|---|---|
+| Eligibility Rules | Tenure, salary band, employment type, attendance score criteria |
+| Approval Queue | Pending EWA requests with risk score; approve/reject/hold |
+| Risk Score | Per-employee risk scoring model display; score breakdown |
+| Withdrawal Limits | Per-request and per-cycle limits; % of earned wage cap |
+| Employer Configuration | EWA program settings per company; enable/disable |
+| Settlement Engine | Settlement schedule; payroll deduction mapping; reconciliation status |
+| Payroll Deduction Preview | Preview of EWA deductions in upcoming payroll |
+| Funding Sources | Linked funding accounts; balance monitoring; top-up trigger |
+| Transactions | Full EWA transaction ledger with status, amount, fee, timestamp |
+| Reconciliation | Cycle reconciliation report; matched/unmatched items |
+| Audit Trail | Every EWA action with actor, timestamp, before/after state |
+| Analytics | Usage rate; average advance amount; repeat usage; department breakdown |
+| EWA Reports | Configurable reports: disbursement, settlement, fee revenue |
+| Fee Configuration | Fee structure builder: flat fee, % fee, tiered fee; per-company override |
+| Notifications | EWA notification templates; trigger rules; delivery channel |
+| API Monitor | EWA API call log; success/failure rates; latency |
+| Wallet Settings | Wallet provider configuration; auto-top-up rules |
+| Cycle Rules | EWA cycle alignment with payroll cycle; blackout dates |
+| Country Rules | Country-specific EWA regulations; compliance flags |
+| Emergency Override | Admin manual override for exceptional disbursements |
+| Manual Adjustment | Manual credit/debit to employee EWA balance with reason |
+
+---
+
+### Module 8 — Loans Module (12 Screens)
+
+**Purpose:** Employee loan lifecycle management from application to settlement.
+
+| Screen | Key Features |
+|---|---|
+| Loan Dashboard | Active loans count; total outstanding; overdue alerts; repayment trend chart |
+| Loan List | All loans with status (Active, Closed, Overdue, Pending Approval) |
+| New Loan | Application form: amount, purpose, tenure, repayment method |
+| Loan Calculator | Interactive calculator: amount + tenure → monthly installment + total interest |
+| Installments | Installment schedule table; paid/upcoming/overdue status per installment |
+| Loan Approval | Multi-level approval with eligibility check display |
+| Outstanding | Outstanding balance summary per employee; aging analysis |
+| Loan Settlement | Early settlement calculation; waiver option; closure confirmation |
+| Loan Reports | Disbursement, repayment, outstanding, overdue reports |
+| Loan Analytics | Portfolio analysis; default rate; department distribution |
+| Policies | Loan policy configuration: max amount, tenure, interest rate, eligibility |
+| Loan Audit | Full audit trail of loan lifecycle events |
+
+---
+
+### Module 9 — Documents (10 Screens)
+
+**Purpose:** Centralized document management with template generation and digital signature.
+
+| Screen | Key Features |
+|---|---|
+| Employee Documents | Per-employee document vault; category tags; expiry alerts |
+| Company Documents | Company-level document repository; access control |
+| Templates | Template library with variable placeholders |
+| Offer Letter | Auto-generated offer letter with employee data merge |
+| Promotion Letter | Promotion letter with old/new role and salary details |
+| Salary Revision | Salary revision letter with effective date |
+| Contracts | Employment contract generator; clause library |
+| PDF Preview | In-browser PDF viewer with zoom, download, print |
+| Digital Signature | E-signature workflow: send → sign → countersign → complete |
+| Version History | Document version timeline; diff view; restore |
+
+---
+
+### Module 10 — Reports (30 Screens)
+
+**Purpose:** Comprehensive reporting across all modules with self-service configuration.
+
+**Report Categories (10 categories × 3 screens each):**
+
+| Category | Reports Included |
+|---|---|
+| Payroll Reports | Payroll Register, Salary Component Summary, Payslip Batch, Bank Payment Report |
+| Employee Reports | Headcount Report, New Hires, Terminations, Employee Master |
+| Attendance Reports | Daily Attendance, Late Report, Absenteeism, Overtime Summary |
+| Leave Reports | Leave Balance, Leave Utilization, Leave Encashment |
+| Loan Reports | Loan Disbursement, Repayment Schedule, Outstanding Balance |
+| EWA Reports | EWA Disbursement, Settlement Report, Fee Revenue, Usage Analytics |
+| Tax Reports | Tax Deduction Summary, YTD Tax, Tax Filing Report |
+| Compliance Reports | Statutory Contribution Report, Compliance Checklist |
+| Financial Reports | GL Journal, Cost Center Report, Department Cost |
+| Analytics Reports | Trend Analysis, Forecast, Custom KPI Report |
+
+**Universal Report Features (every report):**
+- Filter Panel (date range, department, employee, status)
+- Group By (department, location, grade, cost center)
+- Drill Down (click-through to source records)
+- Charts (bar, line, pie — contextual to report type)
+- Export PDF
+- Export Excel
+- Print
+- Schedule Email (frequency, recipients, format)
+
+---
+
+### Module 11 — Analytics (15 Screens)
+
+**Purpose:** Executive-level business intelligence and workforce analytics.
+
+| Screen | Visualizations |
+|---|---|
+| Executive Dashboard | KPI scorecard; multi-module summary; trend indicators |
+| Payroll Cost | Monthly cost trend; YoY comparison; cost per employee |
+| Department Cost | Stacked bar by department; cost center breakdown |
+| Headcount | Growth trend; active/inactive split; turnover rate |
+| Salary Trends | Median salary trend; grade band distribution |
+| Gender Analytics | Gender ratio by department, grade, seniority |
+| Age Distribution | Age band histogram; generation breakdown |
+| Attendance Heatmap | Calendar heatmap; day-of-week patterns |
+| Leave Heatmap | Leave frequency heatmap; peak leave periods |
+| Loan Analytics | Portfolio size trend; default rate; repayment performance |
+| EWA Analytics | Adoption rate; average advance; repeat usage; cost-to-serve |
+| Country Analytics | Multi-country comparison (headcount, cost, compliance) |
+| Branch Analytics | Branch-level performance comparison |
+| Forecast | Payroll cost forecast; headcount projection; EWA demand forecast |
+| Custom Dashboard Builder | Drag-and-drop widget canvas; save/share dashboards |
+
+---
+
+## 4. Cross-Cutting Features
+
+These features apply across all modules and define the overall UX quality of the prototype.
+
+| Feature | Description |
+|---|---|
+| **Role-Based UI** | Admin, HR Manager, Finance, Approver, Employee views with different navigation and action visibility |
+| **Responsive Layout** | Desktop-first; tablet-aware breakpoints |
+| **Empty States** | Illustrated empty states for all list/table screens |
+| **Loading States** | Skeleton loaders for all data-fetching screens |
+| **Error States** | Inline field errors, toast notifications, full-page error screens |
+| **Confirmation Dialogs** | Destructive action confirmations (delete, terminate, reverse) |
+| **Breadcrumb Navigation** | Hierarchical breadcrumbs on all detail screens |
+| **Global Search** | Cross-module search with categorized results |
+| **Notification Center** | Bell icon with unread count; notification drawer with mark-read |
+| **Help & Tooltips** | Contextual help icons with tooltip explanations |
+| **Audit Everywhere** | Every module has an audit trail screen |
+| **Export Everywhere** | PDF/Excel export available on all list and report screens |
+| **Bulk Actions** | Multi-select with bulk approve/reject/export on all list screens |
+| **Pagination** | Consistent pagination with page size selector |
+| **Column Customization** | Show/hide columns on all table views |
+
+---
+
+## 5. Mock Data Requirements
+
+| Entity | Volume |
+|---|---|
+| Companies | 3–5 (multi-entity demo) |
+| Employees | 50–100 (across departments, grades, statuses) |
+| Payroll Runs | 6–12 months of historical data |
+| EWA Transactions | 200+ transactions across employees |
+| Loans | 20–30 active/closed loans |
+| Leave Requests | 50+ across statuses |
+| Attendance Records | 3 months of daily records |
+| Reports | Pre-generated with realistic figures |
+| Notifications | 10–20 unread notifications |
+| Audit Logs | 100+ entries across modules |

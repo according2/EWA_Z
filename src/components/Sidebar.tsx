@@ -13,17 +13,21 @@ import {
   FileSpreadsheet,
   BarChart3,
   Workflow,
-  GitBranch
+  GitBranch,
+  Briefcase,
+  Activity,
+  ShieldAlert
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   pendingEwaCount: number;
+  userRole?: 'Admin' | 'HR';
 }
 
-export default function Sidebar({ activeTab, setActiveTab, pendingEwaCount }: SidebarProps) {
-  const menuItems = [
+export default function Sidebar({ activeTab, setActiveTab, pendingEwaCount, userRole = 'Admin' }: SidebarProps) {
+  const hrMenuItems = [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
     { id: 'organization', name: 'Organization', icon: Building },
     { id: 'employees', name: 'Employees', icon: Users },
@@ -40,17 +44,34 @@ export default function Sidebar({ activeTab, setActiveTab, pendingEwaCount }: Si
     { id: 'settings', name: 'Settings', icon: Settings },
   ];
 
+  const adminMenuItems = [
+    { id: 'dashboard', name: 'Platform Overview', icon: LayoutDashboard },
+    { id: 'sales', name: 'Sales & Clients', icon: Briefcase },
+    { id: 'operations', name: 'Operations', icon: Activity },
+    { id: 'finances', name: 'Finances & Treasury', icon: Landmark },
+    { id: 'risk', name: 'Risk & Underwriting', icon: ShieldAlert },
+    { id: 'reports', name: 'System Reports', icon: FileSpreadsheet },
+    { id: 'integrations', name: 'Core Banking API', icon: GitBranch },
+    { id: 'settings', name: 'Global Settings', icon: Settings },
+  ];
+
+  const menuItems = userRole === 'Admin' ? adminMenuItems : hrMenuItems;
+
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col h-full border-r border-slate-800" id="app-sidebar">
       {/* Brand Header */}
       <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-900/30">
-            Z
+            {userRole === 'Admin' ? 'E' : 'Z'}
           </div>
           <div>
-            <span className="font-semibold text-white tracking-wide text-sm block">Zoho Payroll</span>
-            <span className="text-[10px] text-slate-400 font-medium block uppercase tracking-wider">Prototype Portal</span>
+            <span className="font-semibold text-white tracking-wide text-sm block">
+              {userRole === 'Admin' ? 'EWA Platform' : 'Zoho Payroll'}
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium block uppercase tracking-wider">
+              {userRole === 'Admin' ? 'Provider Back-Office' : 'Client Portal'}
+            </span>
           </div>
         </div>
       </div>
@@ -89,12 +110,16 @@ export default function Sidebar({ activeTab, setActiveTab, pendingEwaCount }: Si
         <div className="flex items-center space-x-2 text-slate-400">
           <Building className="w-4.5 h-4.5 text-slate-500" />
           <div className="truncate">
-            <span className="block font-medium text-slate-300">Zylker Tech</span>
-            <span className="block text-[10px] text-slate-500">U72200TN2020PTC</span>
+            <span className="block font-medium text-slate-300">
+              {userRole === 'Admin' ? 'Provider Inc.' : 'Zylker Tech'}
+            </span>
+            <span className="block text-[10px] text-slate-500">
+              {userRole === 'Admin' ? 'Admin Node' : 'U72200TN2020PTC'}
+            </span>
           </div>
         </div>
         <div className="mt-2 text-[10px] text-slate-600 text-center uppercase tracking-widest font-mono">
-          V2.4.0 (Vite)
+          V2.5.0 (Vite)
         </div>
       </div>
     </aside>

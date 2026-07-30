@@ -25,6 +25,7 @@ import ReportsView from './components/ReportsView';
 import AnalyticsView from './components/AnalyticsView';
 import WorkflowsView from './components/WorkflowsView';
 import IntegrationsView from './components/IntegrationsView';
+import { ProviderDashboardView, ProviderSalesView, ProviderFinancesView, ProviderRiskView, ProviderOperationsView } from './components/ProviderViews';
 
 // Core mock databases
 import { 
@@ -68,6 +69,11 @@ export default function App() {
 
   // Master State databases
   const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
+
+  useEffect(() => {
+    setActiveTab('dashboard');
+  }, [userRole]);
+
   const [payRuns, setPayRuns] = useState<PayRun[]>(INITIAL_PAY_RUNS);
   const [ewaRequests, setEwaRequests] = useState<EWARequest[]>(INITIAL_EWA_REQUESTS);
   const [deductions, setDeductions] = useState<DeductionComponent[]>(INITIAL_DEDUCTION_COMPONENTS);
@@ -151,6 +157,7 @@ export default function App() {
   const renderActiveView = () => {
     switch (activeTab) {
       case 'dashboard':
+        if (userRole === 'Admin') return <ProviderDashboardView />;
         return (
           <DashboardView 
             employees={employees}
@@ -160,6 +167,14 @@ export default function App() {
             setActiveTab={setActiveTab}
           />
         );
+      case 'sales':
+        return <ProviderSalesView />;
+      case 'finances':
+        return <ProviderFinancesView />;
+      case 'risk':
+        return <ProviderRiskView />;
+      case 'operations':
+        return <ProviderOperationsView />;
       case 'organization':
         return (
           <OrganizationView 
@@ -325,6 +340,7 @@ export default function App() {
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         pendingEwaCount={pendingEwaCount}
+        userRole={userRole}
       />
 
       {/* Main Workspace Frame */}

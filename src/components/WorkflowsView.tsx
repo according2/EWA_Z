@@ -14,7 +14,11 @@ import {
   Calendar,
   MousePointerClick,
   Clock,
-  Settings
+  Settings,
+  Repeat,
+  FileText,
+  UserPlus,
+  Landmark
 } from 'lucide-react';
 
 interface WorkflowsViewProps {
@@ -22,7 +26,8 @@ interface WorkflowsViewProps {
 }
 
 export default function WorkflowsView({ addToast }: WorkflowsViewProps) {
-  const [activeTab, setActiveTab] = useState<'approvals' | 'actions' | 'events' | 'custom'>('approvals');
+  const [activeTab, setActiveTab] = useState<'definitions' | 'config' | 'loops' | 'custom'>('definitions');
+  const [selectedDefinition, setSelectedDefinition] = useState('ewa');
 
   // Approval Nodes
   const [nodes, setNodes] = useState([
@@ -30,14 +35,16 @@ export default function WorkflowsView({ addToast }: WorkflowsViewProps) {
     { id: '2', role: 'HR Payroll Specialist', name: 'Kyaw Zin Htet', action: 'Statutory Compliance Check' },
     { id: '3', role: 'VP Operations', name: 'Daw Khin Myat Noe', action: 'Final Budget Sign-Off' }
   ]);
+
   const [newNodeRole, setNewNodeRole] = useState('Department Head');
   const [newNodeName, setNewNodeName] = useState('');
 
-  // Actions
-  const [actions, setActions] = useState([
-    { id: '1', type: 'Email', name: 'Send Pay Slip Email', status: 'Active' },
-    { id: '2', type: 'Webhook', name: 'Sync with External HRMS', status: 'Active' },
-  ]);
+  const definitions = [
+    { id: 'ewa', name: 'EWA Budget Request', icon: Landmark, desc: 'Routing and approval rules for high-value EWA requests.' },
+    { id: 'onboarding', name: 'Employee Onboarding', icon: UserPlus, desc: 'Provisioning checklist, statutory forms, and IT setup.' },
+    { id: 'mgmt', name: 'Employee Mgmt (Promotion/Exit)', icon: Users, desc: 'Lifecycle transitions, compensation changes, offboarding.' },
+    { id: 'payroll', name: 'Payroll Run Approval', icon: FileText, desc: 'Final checker authorization for monthly pay disbursements.' }
+  ];
 
   const handleAppendNode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,15 +80,15 @@ export default function WorkflowsView({ addToast }: WorkflowsViewProps) {
           <Workflow className="w-6 h-6 text-blue-600" />
           <div>
             <h2 className="text-lg font-bold">Workflow Creator</h2>
-            <p className="text-xs text-slate-500 font-medium">Design automated approvals, actions, and custom logic for your applications.</p>
+            <p className="text-xs text-slate-500 font-medium">Design automated definitions, configs, for-each batch loops, and custom scripts.</p>
           </div>
         </div>
-
+        
         <div className="flex space-x-2 border-b border-slate-200">
           {[
-            { id: 'approvals', label: 'Approvals', icon: CheckCircle2 },
-            { id: 'actions', label: 'Actions', icon: Zap },
-            { id: 'events', label: 'Events & Triggers', icon: Calendar },
+            { id: 'definitions', label: 'Workflow Definitions', icon: GitCommit },
+            { id: 'config', label: 'Node Config & Rules', icon: Settings },
+            { id: 'loops', label: 'For Each (Batch Runs)', icon: Repeat },
             { id: 'custom', label: 'Custom Scripts', icon: Code }
           ].map(tab => {
             const Icon = tab.icon;
@@ -102,15 +109,43 @@ export default function WorkflowsView({ addToast }: WorkflowsViewProps) {
         </div>
       </div>
 
-      {activeTab === 'approvals' && (
+      {activeTab === 'definitions' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <div className="lg:col-span-4 space-y-3">
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Available Workflows</h3>
+            {definitions.map(def => {
+              const Icon = def.icon;
+              const isSelected = selectedDefinition === def.id;
+              return (
+                <div 
+                  key={def.id}
+                  onClick={() => setSelectedDefinition(def.id)}
+                  className={`p-3 rounded-xl border cursor-pointer transition ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                >
+                  <div className="flex items-center space-x-3 mb-1">
+                    <div className={`p-1.5 rounded ${isSelected ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <h4 className={`text-sm font-bold ${isSelected ? 'text-blue-900' : 'text-slate-800'}`}>{def.name}</h4>
+                  </div>
+                  <p className="text-xs text-slate-500 ml-9">{def.desc}</p>
+                </div>
+              );
+            })}
+            <button className="w-full py-2 border border-dashed border-slate-300 text-slate-500 rounded-xl hover:bg-slate-50 hover:text-slate-700 text-xs font-bold flex items-center justify-center space-x-2">
+              <Plus className="w-4 h-4" />
+              <span>Create New Workflow</span>
+            </button>
+          </div>
+
           <div className="lg:col-span-8 bg-white rounded-xl border border-slate-200 p-6 space-y-5">
             <div>
               <span className="bg-blue-50 text-blue-700 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded border border-blue-100">
                 Visual Designer
               </span>
-              <h3 className="text-sm font-extrabold text-slate-800 mt-1.5">EWA & Salary Advance Approval Chain</h3>
-              <p className="text-xs text-slate-400">Specify sequential reviewing tiers. System halts pay cycle disbursement until all nodes resolve.</p>
+              <h3 className="text-sm font-extrabold text-slate-800 mt-1.5">{definitions.find(d => d.id === selectedDefinition)?.name} - Execution Chain</h3>
+              <p className="text-xs text-slate-400">Specify sequential reviewing tiers and automated actions. System halts process until all nodes resolve.</p>
             </div>
 
             <div className="relative pl-6 space-y-6 border-l-2 border-dashed border-blue-200 py-2">
@@ -119,48 +154,40 @@ export default function WorkflowsView({ addToast }: WorkflowsViewProps) {
                   <span className="absolute -left-9 top-0.5 w-6 h-6 rounded-full bg-blue-100 border-2 border-blue-600 text-blue-700 flex items-center justify-center font-bold text-[10px]">
                     {idx + 1}
                   </span>
-
-                  <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                  <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-sm flex items-start justify-between">
                     <div>
-                      <span className="bg-blue-50 text-blue-700 font-extrabold text-[9px] uppercase px-1.5 py-0.5 rounded border border-blue-100 font-mono">
-                        {node.role}
-                      </span>
-                      <span className="font-bold text-slate-800 block mt-1">{node.name}</span>
-                      <span className="text-[10px] text-slate-400 font-semibold">{node.action}</span>
+                      <h4 className="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                        <span>{node.role}</span>
+                      </h4>
+                      <p className="text-slate-500 mt-0.5">Assignee: <span className="font-semibold text-slate-700">{node.name}</span></p>
+                      <p className="text-slate-400 mt-1 flex items-center">
+                        <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-500" />
+                        {node.action}
+                      </p>
                     </div>
-                    {idx > 0 && (
-                      <button 
-                        onClick={() => handleDeleteNode(node.id, node.name)}
-                        className="p-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded transition"
-                        title="Remove Node"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => handleDeleteNode(node.id, node.name)}
+                      className="text-slate-400 hover:text-rose-500 p-1 rounded hover:bg-rose-50 transition"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-            {nodes.length === 0 && (
-              <div className="p-6 text-center text-xs text-slate-400 italic">
-                All custom approval tiers deleted. Automatic instant approval policy active.
-              </div>
-            )}
-          </div>
 
-          <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b pb-3 border-slate-100">
-                Append Approval Reviewer Node
+            <div className="mt-8 border-t border-slate-100 pt-6">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4">
+                Append Node
               </h3>
               
-              <form onSubmit={handleAppendNode} className="space-y-3.5 text-xs">
-                <div>
-                  <label className="block text-slate-500 font-semibold mb-1">Approval Tier Level/Role</label>
+              <form onSubmit={handleAppendNode} className="flex items-end space-x-3 text-xs">
+                <div className="flex-1">
+                  <label className="block text-slate-500 font-semibold mb-1">Tier/Role</label>
                   <select
                     value={newNodeRole}
                     onChange={(e) => setNewNodeRole(e.target.value)}
-                    className="w-full border border-slate-200 rounded p-2 text-xs bg-white focus:outline-none"
+                    className="w-full border border-slate-200 rounded p-2 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                   >
                     <option>Department Head</option>
                     <option>Internal Auditor</option>
@@ -169,95 +196,88 @@ export default function WorkflowsView({ addToast }: WorkflowsViewProps) {
                     <option>VP Operations</option>
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-slate-500 font-semibold mb-1">Assigned Administrator Name</label>
+                <div className="flex-1">
+                  <label className="block text-slate-500 font-semibold mb-1">Assignee</label>
                   <input
                     type="text"
                     placeholder="e.g. Anand Sharma"
                     value={newNodeName}
                     onChange={(e) => setNewNodeName(e.target.value)}
-                    className="w-full border border-slate-200 rounded p-2 text-xs focus:outline-none"
+                    className="w-full border border-slate-200 rounded p-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-
                 <button
                   type="submit"
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg cursor-pointer transition flex items-center justify-center space-x-1.5"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg cursor-pointer transition flex items-center space-x-1.5"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Attach Escalate Node</span>
+                  <span>Add</span>
                 </button>
               </form>
             </div>
           </div>
+
         </div>
       )}
 
-      {activeTab === 'actions' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <h3 className="text-sm font-bold text-slate-800">Automated Actions</h3>
-            {actions.map(action => (
-              <div key={action.id} className="bg-white border border-slate-200 p-4 rounded-xl flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-slate-50 text-slate-600 rounded-lg border border-slate-100">
-                    {action.type === 'Email' ? <Mail className="w-5 h-5" /> : <Webhook className="w-5 h-5" />}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800">{action.name}</h4>
-                    <p className="text-xs text-slate-500 font-medium">{action.type} Integration</p>
-                  </div>
+      {activeTab === 'config' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-6">
+          <h3 className="text-sm font-bold text-slate-800">Node Configuration & Rules Engine</h3>
+          <p className="text-xs text-slate-500">Configure SLA timers, dynamic routing conditions, and fallback delegates for nodes.</p>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="border border-slate-200 p-4 rounded-xl space-y-4">
+              <div className="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                <Clock className="w-4 h-4 text-amber-500" />
+                <h4 className="font-bold text-slate-700 text-sm">SLA & Escalation</h4>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-600 font-semibold">Max Wait Time (Hours)</span>
+                  <input type="number" defaultValue="48" className="border border-slate-200 rounded p-1 w-20 text-right font-mono" />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="px-2 py-1 text-[10px] font-bold uppercase rounded bg-green-50 text-green-700 border border-green-100">
-                    {action.status}
-                  </span>
-                  <button className="text-slate-400 hover:text-blue-600 p-1">
-                    <Settings className="w-4 h-4" />
-                  </button>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-600 font-semibold">Auto-Action on Timeout</span>
+                  <select className="border border-slate-200 rounded p-1">
+                    <option>Escalate to Manager</option>
+                    <option>Auto-Reject</option>
+                    <option>Auto-Approve</option>
+                  </select>
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="space-y-4">
-            <div className="bg-white border border-slate-200 p-5 rounded-xl space-y-3 text-sm">
-              <h4 className="font-bold text-slate-800 border-b border-slate-100 pb-2">Add New Action</h4>
-              <button className="w-full flex items-center space-x-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-700 font-semibold text-xs">
-                <Mail className="w-4 h-4 text-slate-400" />
-                <span>Send Email Notification</span>
-              </button>
-              <button className="w-full flex items-center space-x-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-700 font-semibold text-xs">
-                <Bell className="w-4 h-4 text-slate-400" />
-                <span>Send Push Notification</span>
-              </button>
-              <button className="w-full flex items-center space-x-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-700 font-semibold text-xs">
-                <Webhook className="w-4 h-4 text-slate-400" />
-                <span>Trigger Webhook</span>
-              </button>
+            </div>
+
+            <div className="border border-slate-200 p-4 rounded-xl space-y-4">
+              <div className="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                <Workflow className="w-4 h-4 text-purple-500" />
+                <h4 className="font-bold text-slate-700 text-sm">Dynamic Routing Conditions</h4>
+              </div>
+              <div className="bg-slate-50 p-3 rounded border border-slate-200 text-xs font-mono text-slate-600">
+                IF <span className="text-purple-600 font-bold">Request.Amount</span> {'>'} 500,000<br/>
+                THEN RouteTo <span className="text-blue-600 font-bold">Finance Director</span><br/>
+                ELSE RouteTo <span className="text-blue-600 font-bold">Direct Manager</span>
+              </div>
+              <button className="text-blue-600 font-bold text-xs hover:underline">+ Add Condition Branch</button>
             </div>
           </div>
         </div>
       )}
 
-      {activeTab === 'events' && (
+      {activeTab === 'loops' && (
         <div className="bg-white border border-slate-200 rounded-xl p-6">
-          <h3 className="text-sm font-bold text-slate-800 mb-4">Event Triggers</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 border border-slate-200 rounded-xl hover:border-blue-400 transition cursor-pointer group">
-              <MousePointerClick className="w-6 h-6 text-slate-400 group-hover:text-blue-500 mb-2" />
-              <h4 className="text-sm font-bold text-slate-800">On Record Create</h4>
-              <p className="text-xs text-slate-500 mt-1">Triggered when a new form submission is created.</p>
+          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center"><Repeat className="w-5 h-5 mr-2 text-blue-500" /> For Each (Batch Process Loops)</h3>
+          <p className="text-xs text-slate-500 mb-6">Iterate over collections of records to trigger sub-workflows, send batch emails, or perform bulk API actions.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 border border-slate-200 rounded-xl hover:border-blue-400 transition cursor-pointer group bg-slate-50">
+              <Users className="w-6 h-6 text-slate-400 group-hover:text-blue-500 mb-2" />
+              <h4 className="text-sm font-bold text-slate-800">For Each: Employee in Department</h4>
+              <p className="text-xs text-slate-500 mt-1">Iterate over all active staff in a selected department to issue policy acknowledgments.</p>
             </div>
-            <div className="p-4 border border-slate-200 rounded-xl hover:border-blue-400 transition cursor-pointer group">
-              <GitCommit className="w-6 h-6 text-slate-400 group-hover:text-blue-500 mb-2" />
-              <h4 className="text-sm font-bold text-slate-800">On Record Update</h4>
-              <p className="text-xs text-slate-500 mt-1">Triggered when an existing record is modified.</p>
-            </div>
-            <div className="p-4 border border-slate-200 rounded-xl hover:border-blue-400 transition cursor-pointer group">
-              <Clock className="w-6 h-6 text-slate-400 group-hover:text-blue-500 mb-2" />
-              <h4 className="text-sm font-bold text-slate-800">Scheduled Run</h4>
-              <p className="text-xs text-slate-500 mt-1">Execute periodically (daily, weekly, custom intervals).</p>
+            <div className="p-4 border border-slate-200 rounded-xl hover:border-blue-400 transition cursor-pointer group bg-slate-50">
+              <FileText className="w-6 h-6 text-slate-400 group-hover:text-blue-500 mb-2" />
+              <h4 className="text-sm font-bold text-slate-800">For Each: Pending EWA Request</h4>
+              <p className="text-xs text-slate-500 mt-1">Batch process all approved requests daily at 5 PM for bulk CB Bank disbursement.</p>
             </div>
           </div>
         </div>
@@ -275,9 +295,7 @@ export default function WorkflowsView({ addToast }: WorkflowsViewProps) {
             </button>
           </div>
           <div className="flex-1 p-4 font-mono text-xs text-slate-300 overflow-auto">
-            <pre className="leading-relaxed">
-{`// Zoho Creator equivalent custom Deluge/JS function
-
+            <pre className="leading-relaxed">{`// Zoho Creator equivalent custom Deluge/JS function
 export async function processEwaRequest(record, context) {
   // 1. Fetch employee details
   const employee = await db.employees.findById(record.employeeId);
@@ -288,6 +306,7 @@ export async function processEwaRequest(record, context) {
 
   // 2. Validate requested amount
   const maxAllowed = employee.earnedWage * 0.50; // 50% max limit
+  
   if (record.amount > maxAllowed) {
     // 3. Trigger approval flow if exceeds limit
     await workflow.triggerApproval('High Value EWA', record);
@@ -315,8 +334,6 @@ export async function processEwaRequest(record, context) {
           </div>
         </div>
       )}
-
     </div>
   );
 }
-

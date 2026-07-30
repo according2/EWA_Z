@@ -34,11 +34,22 @@ export default function SettingsView({
   setSalaryComponents,
   addToast
 }: SettingsViewProps) {
-  const [activeSettingsSubTab, setActiveSettingsSubTab] = useState<'Profile' | 'Components' | 'Statutory'>('Profile');
+  const [activeSettingsSubTab, setActiveSettingsSubTab] = useState<'Profile' | 'Components' | 'Statutory' | 'EWA'>('Profile');
 
   // Form states initialized with props
   const [profileForm, setProfileForm] = useState<CompanySetting>({ ...companySettings });
   const [statutoryForm, setStatutoryForm] = useState<StatutorySetting>({ ...statutorySettings });
+  
+  // EWA config state
+  const [ewaConfig, setEwaConfig] = useState({
+    maxWithdrawalPercent: 50,
+    withdrawalFeeType: 'Flat', // 'Flat' | 'Percentage'
+    withdrawalFeeAmount: 1500, // Ks
+    withdrawalFeePercentage: 2, // %
+    maxWithdrawalsPerCycle: 3,
+    minWithdrawalAmount: 5000,
+    feeBearer: 'Employee' // 'Employee' | 'Employer' | 'Split'
+  });
 
   // Salary components modal states
   const [showAddComponentModal, setShowAddComponentModal] = useState(false);
@@ -134,6 +145,17 @@ export default function SettingsView({
         >
           <ShieldCheck className="w-4 h-4" />
           <span>Statutory (PF, SSB Medical, PT) Slabs</span>
+        </button>
+        <button
+          onClick={() => setActiveSettingsSubTab('EWA')}
+          className={`pb-3 flex items-center space-x-2 border-b-2 transition-all ${
+            activeSettingsSubTab === 'EWA'
+              ? 'border-blue-600 text-blue-700 font-extrabold'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Calculator className="w-4 h-4" />
+          <span>EWA Policy & Fees</span>
         </button>
       </div>
 
@@ -547,6 +569,126 @@ export default function SettingsView({
             </button>
           </div>
         </form>
+      )}
+
+      {/* Sub Tab: EWA Config */}
+      {activeSettingsSubTab === 'EWA' && (
+        <div className="space-y-6 text-xs">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <div>
+              <h4 className="font-bold text-slate-800 text-sm uppercase">Earned Wage Access (EWA) Policy Limits</h4>
+              <p className="text-slate-500 font-medium mt-1">Configure company-wide rules, withdrawal ceilings, and fee handling for the EWA program.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              
+              <div className="space-y-4">
+                <h5 className="font-bold text-slate-700 border-b border-slate-100 pb-2">Access & Limits</h5>
+                
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Max Withdrawal Limit (% of Earned)</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={ewaConfig.maxWithdrawalPercent}
+                      onChange={(e) => setEwaConfig({...ewaConfig, maxWithdrawalPercent: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-slate-700 font-bold"
+                    />
+                    <span className="text-slate-400 font-bold">%</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Max Withdrawals per Cycle</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={ewaConfig.maxWithdrawalsPerCycle}
+                    onChange={(e) => setEwaConfig({...ewaConfig, maxWithdrawalsPerCycle: parseInt(e.target.value) || 1})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-slate-700 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Minimum Withdrawal Amount (Ks)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={ewaConfig.minWithdrawalAmount}
+                    onChange={(e) => setEwaConfig({...ewaConfig, minWithdrawalAmount: parseInt(e.target.value) || 0})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-slate-700 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h5 className="font-bold text-slate-700 border-b border-slate-100 pb-2">Fee Configuration</h5>
+                
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Fee Bearer (Who pays the fee?)</label>
+                  <select
+                    value={ewaConfig.feeBearer}
+                    onChange={(e) => setEwaConfig({...ewaConfig, feeBearer: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+                  >
+                    <option value="Employee">Employee (Deducted from withdrawal)</option>
+                    <option value="Employer">Employer (Company pays Provider)</option>
+                    <option value="Split">Split 50/50</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Provider Fee Structure</label>
+                  <select
+                    value={ewaConfig.withdrawalFeeType}
+                    onChange={(e) => setEwaConfig({...ewaConfig, withdrawalFeeType: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+                  >
+                    <option value="Flat">Flat Fee per Transaction</option>
+                    <option value="Percentage">Percentage of Amount</option>
+                  </select>
+                </div>
+
+                {ewaConfig.withdrawalFeeType === 'Flat' ? (
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Flat Fee Amount (Ks)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={ewaConfig.withdrawalFeeAmount}
+                      onChange={(e) => setEwaConfig({...ewaConfig, withdrawalFeeAmount: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-slate-700 font-bold"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Percentage Fee (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min={0}
+                      value={ewaConfig.withdrawalFeePercentage}
+                      onChange={(e) => setEwaConfig({...ewaConfig, withdrawalFeePercentage: parseFloat(e.target.value) || 0})}
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-slate-700 font-bold"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-slate-200">
+              <button
+                onClick={() => addToast("EWA limits and fee configurations saved successfully.", "success")}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-colors text-xs flex items-center space-x-1.5"
+              >
+                <Check className="w-4 h-4" />
+                <span>Save EWA Policy</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Add salary component modal */}

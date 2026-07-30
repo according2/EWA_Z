@@ -48,6 +48,7 @@ interface Toast {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [userRole, setUserRole] = useState<'Admin' | 'HR'>('Admin');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     return localStorage.getItem('zylker_is_logged_in') === 'true';
   });
@@ -217,6 +218,7 @@ export default function App() {
           <ReportsView 
             employees={employees}
             addToast={addToast}
+            userRole={userRole}
           />
         );
       case 'analytics':
@@ -334,6 +336,8 @@ export default function App() {
           onNotificationAction={setActiveTab} 
           pendingEwaCount={pendingEwaCount}
           onLogout={handleLogout}
+          userRole={userRole}
+          setUserRole={setUserRole}
         />
 
         {/* Selected Module Scrollable Canvas */}

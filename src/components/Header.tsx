@@ -15,9 +15,11 @@ interface HeaderProps {
   onNotificationAction: (tab: string) => void;
   pendingEwaCount: number;
   onLogout?: () => void;
+  userRole?: 'Admin' | 'HR';
+  setUserRole?: (role: 'Admin' | 'HR') => void;
 }
 
-export default function Header({ activeTab, onNotificationAction, pendingEwaCount, onLogout }: HeaderProps) {
+export default function Header({ activeTab, onNotificationAction, pendingEwaCount, onLogout, userRole = 'Admin', setUserRole }: HeaderProps) {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const getBreadcrumbs = () => {
@@ -218,12 +220,22 @@ export default function Header({ activeTab, onNotificationAction, pendingEwaCoun
 
         {/* User Badge */}
         <div className="flex items-center space-x-3 border-l border-slate-200 pl-6">
+          <div className="flex items-center space-x-2 mr-2">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">View As:</span>
+            <button 
+              onClick={() => setUserRole?.(userRole === 'Admin' ? 'HR' : 'Admin')}
+              className={`px-2 py-1 text-[10px] font-bold rounded ${userRole === 'Admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'} transition-colors`}
+            >
+              {userRole === 'Admin' ? 'System Admin' : 'Company HR'}
+            </button>
+          </div>
+          
           <div className="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center font-bold text-blue-700 text-xs shadow-sm">
-            HR
+            {userRole === 'Admin' ? 'AD' : 'HR'}
           </div>
           <div className="hidden sm:block text-left">
-            <span className="block text-xs font-bold text-slate-700">admin@zylker.com</span>
-            <span className="block text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Payroll Admin</span>
+            <span className="block text-xs font-bold text-slate-700">{userRole === 'Admin' ? 'superadmin@system.com' : 'admin@zylker.com'}</span>
+            <span className="block text-[10px] text-slate-400 font-semibold tracking-wider uppercase">{userRole === 'Admin' ? 'Platform Admin' : 'Payroll Admin'}</span>
           </div>
           {onLogout && (
             <button 

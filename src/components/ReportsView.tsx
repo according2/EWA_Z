@@ -11,18 +11,68 @@ import {
   PieChart,
   Landmark,
   Calculator,
-  Search
+  Search,
+  X
 } from 'lucide-react';
 import { Employee } from '../types';
 
 interface ReportsViewProps {
   employees: Employee[];
   addToast: (message: string, type: 'success' | 'info' | 'error') => void;
+  userRole?: 'Admin' | 'HR';
 }
 
-export default function ReportsView({ employees, addToast }: ReportsViewProps) {
+export default function ReportsView({ employees, addToast, userRole = 'Admin' }: ReportsViewProps) {
   const [activeTab, setActiveTab] = useState<'accounting' | 'compliance' | 'payroll'>('accounting');
-  const [accountingTab, setAccountingTab] = useState<'coa' | 'gl' | 'pnl' | 'balancesheet'>('coa');
+  const [accountingTab, setAccountingTab] = useState<'coa' | 'gl' | 'pnl' | 'balancesheet' | 'gl_adjustment'>('gl_adjustment');
+  const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+  const [newAdjustment, setNewAdjustment] = useState({
+    account: '',
+    type: 'Reimbursement', // 'Reimbursement' | 'Repayment' | 'Late Fee' | 'Manual Transfer'
+    amount: 0,
+    memo: '',
+    org: 'Zylker Corp'
+  });
+  
+  const [adjustments, setAdjustments] = useState([
+    { id: 'ADJ-101', org: 'Zylker Corp', date: '2026-07-28', account: '2100 - Accrued Payroll', type: 'Late Fee', amount: 5000, memo: 'Penalty for late SSB filing', maker: 'hr_manager', status: 'Pending Checker' },
+    { id: 'ADJ-102', org: 'Acme Ltd', date: '2026-07-29', account: '1000 - Cash', type: 'Reimbursement', amount: 45000, memo: 'Travel reimbursement fund top-up', maker: 'sys_admin', status: 'Approved' },
+    { id: 'ADJ-103', org: 'Zylker Corp', date: '2026-07-30', account: '1100 - Accounts Rec.', type: 'Repayment', amount: 12000, memo: 'EWA recovery missing amount', maker: 'hr_manager', status: 'Pending Checker' },
+  ]);
+
+  const handleApproveAdjustment = (id: string) => {
+    setAdjustments(prev => prev.map(a => a.id === id ? { ...a, status: 'Approved' } : a));
+    addToast(`Adjustment ${id} approved successfully and posted to GL.`, 'success');
+  };
+
+  const handleRejectAdjustment = (id: string) => {
+    setAdjustments(prev => prev.map(a => a.id === id ? { ...a, status: 'Rejected' } : a));
+    addToast(`Adjustment ${id} was rejected.`, 'info');
+  };
+
+  const handleAddAdjustment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newAdjustment.amount <= 0 || !newAdjustment.account) {
+      addToast('Please provide a valid account and positive amount.', 'error');
+      return;
+    }
+    const nextId = `ADJ-${104 + adjustments.length}`;
+    setAdjustments([{
+      id: nextId,
+      org: userRole === 'Admin' ? newAdjustment.org : 'Zylker Corp',
+      date: new Date().toISOString().split('T')[0],
+      account: newAdjustment.account,
+      type: newAdjustment.type,
+      amount: newAdjustment.amount,
+      memo: newAdjustment.memo,
+      maker: userRole === 'Admin' ? 'sys_admin' : 'hr_manager',
+      status: 'Pending Checker'
+    }, ...adjustments]);
+    setShowAdjustmentModal(false);
+    addToast(`Manual fund adjustment submitted for checker approval.`, 'success');
+  };
+
+  const visibleAdjustments = userRole === 'Admin' ? adjustments : adjustments.filter(a => a.org === 'Zylker Corp');
   
   const [reportQuarter, setReportQuarter] = useState('FY 2026-27 (Annual)');
   const [reportGenerating, setReportGenerating] = useState(false);
@@ -129,6 +179,7 @@ export default function ReportsView({ employees, addToast }: ReportsViewProps) {
         <div className="space-y-6">
           <div className="flex space-x-2">
             {[
+              { id: 'gl_adjustment', label: 'Fund Move Adjust GL (Maker/Checker)' },
               { id: 'coa', label: 'Chart of Accounts (COA)' },
               { id: 'gl', label: 'General Ledger (GL)' },
               { id: 'pnl', label: 'Profit & Loss Statement' },
@@ -147,6 +198,78 @@ export default function ReportsView({ employees, addToast }: ReportsViewProps) {
               </button>
             ))}
           </div>
+
+          {accountingTab === 'gl_adjustment' && (
+            <div className="space-y-6">
+              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                  <div>
+                    <h3 className="font-bold text-slate-800 text-sm">Manual Fund Movement & GL Adjustment</h3>
+                    <p className="text-[10px] text-slate-500 font-medium">Core Wallet Bank logic: handle reimbursements, repayments, late fees across orgs.</p>
+                  </div>
+                  <button onClick={() => setShowAdjustmentModal(true)} className="px-3 py-1.5 bg-blue-600 text-white font-bold text-xs rounded-lg hover:bg-blue-700 transition">
+                    + New Manual Entry
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
+                      <tr>
+                        <th className="p-3">ID / Date</th>
+                        <th className="p-3">Organization</th>
+                        <th className="p-3">Account</th>
+                        <th className="p-3">Type</th>
+                        <th className="p-3 text-right">Amount (Ks)</th>
+                        <th className="p-3">Maker (Status)</th>
+                        <th className="p-3">Checker Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {visibleAdjustments.map((adj) => (
+                        <tr key={adj.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-3">
+                            <span className="block font-bold text-slate-700">{adj.id}</span>
+                            <span className="text-slate-400 font-medium">{adj.date}</span>
+                          </td>
+                          <td className="p-3 font-semibold text-slate-600">{adj.org}</td>
+                          <td className="p-3 font-mono font-medium text-slate-600">{adj.account}</td>
+                          <td className="p-3">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-slate-100 text-slate-600 border-slate-200">
+                              {adj.type}
+                            </span>
+                          </td>
+                          <td className="p-3 text-right font-mono font-bold text-slate-800">
+                            {adj.amount.toLocaleString()}
+                          </td>
+                          <td className="p-3">
+                            <span className="block text-slate-600 font-medium">{adj.maker}</span>
+                            <span className={`text-[10px] font-bold ${adj.status === 'Approved' ? 'text-emerald-600' : adj.status === 'Rejected' ? 'text-rose-600' : 'text-amber-600'}`}>
+                              {adj.status}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            {adj.status === 'Pending Checker' ? (
+                              <div className="flex space-x-2">
+                                <button onClick={() => handleApproveAdjustment(adj.id)} className="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded font-bold text-[10px] hover:bg-emerald-100">Approve</button>
+                                <button onClick={() => handleRejectAdjustment(adj.id)} className="px-2 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded font-bold text-[10px] hover:bg-rose-100">Reject</button>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 text-[10px] font-bold">Processed</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {visibleAdjustments.length === 0 && (
+                    <div className="p-6 text-center text-slate-400 font-medium text-xs">
+                      No adjustments found for {userRole === 'Admin' ? 'any organization' : 'your organization'}.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {accountingTab === 'coa' && (
             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
@@ -377,7 +500,105 @@ export default function ReportsView({ employees, addToast }: ReportsViewProps) {
         </div>
       )}
 
+      {/* Manual Adjustment Modal */}
+      {showAdjustmentModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+              <h3 className="font-bold text-slate-800 text-sm">New Manual GL Adjustment</h3>
+              <button onClick={() => setShowAdjustmentModal(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-full">
+                <X className="w-4.5 h-4.5" />
+              </button>
+            </div>
+            <form onSubmit={handleAddAdjustment} className="p-6 space-y-4 text-xs">
+              {userRole === 'Admin' && (
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Organization</label>
+                  <select
+                    value={newAdjustment.org}
+                    onChange={(e) => setNewAdjustment({ ...newAdjustment, org: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+                  >
+                    <option value="Zylker Corp">Zylker Corp</option>
+                    <option value="Acme Ltd">Acme Ltd</option>
+                    <option value="Global Tech">Global Tech</option>
+                  </select>
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-slate-500 font-semibold mb-1">Entry Type</label>
+                <select
+                  value={newAdjustment.type}
+                  onChange={(e) => setNewAdjustment({ ...newAdjustment, type: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+                >
+                  <option value="Reimbursement">Reimbursement</option>
+                  <option value="Repayment">Repayment</option>
+                  <option value="Late Fee">Late Fee</option>
+                  <option value="Manual Transfer">Manual Transfer / Offset</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-500 font-semibold mb-1">Target Account</label>
+                <select
+                  value={newAdjustment.account}
+                  onChange={(e) => setNewAdjustment({ ...newAdjustment, account: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+                >
+                  <option value="" disabled>Select Account</option>
+                  {chartOfAccounts.map(acc => (
+                    <option key={acc.code} value={`${acc.code} - ${acc.name}`}>
+                      {acc.code} - {acc.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-500 font-semibold mb-1">Amount (Ks)</label>
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  value={newAdjustment.amount || ''}
+                  onChange={(e) => setNewAdjustment({ ...newAdjustment, amount: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono font-bold text-slate-700"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-slate-500 font-semibold mb-1">Memo / Justification</label>
+                <textarea
+                  required
+                  rows={2}
+                  value={newAdjustment.memo}
+                  onChange={(e) => setNewAdjustment({ ...newAdjustment, memo: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700"
+                  placeholder="Reason for manual adjustment..."
+                />
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdjustmentModal(false)}
+                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+                >
+                  Submit to Checker
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

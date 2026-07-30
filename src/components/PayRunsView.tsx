@@ -81,7 +81,7 @@ export default function PayRunsView({ payRuns, setPayRuns, employees, addToast }
       const bank = emp ? emp.bankName : 'UNKNOWN BANK';
       const acct = emp ? emp.accountNumber : '0000000000';
       const ifsc = emp ? emp.ifscCode : 'IFSC000000';
-      return `${sal.employeeId},${sal.employeeName.padEnd(20, ' ')},${bank.padEnd(15, ' ')},${acct},${ifsc},INR,${sal.netPay}.00`;
+      return `${sal.employeeId},${sal.employeeName.padEnd(20, ' ')},${bank.padEnd(15, ' ')},${acct},${ifsc},MMK,${sal.netPay}.00`;
     }).join('\n');
 
     const fileContent = header + rows;
@@ -471,7 +471,7 @@ export default function PayRunsView({ payRuns, setPayRuns, employees, addToast }
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-extrabold font-mono text-white">Ks {payslipData.payDetail.netPay.toLocaleString()}</span>
-                  <span className="text-[10px] text-slate-400 font-bold block mt-0.5">Rupees {payslipData.payDetail.netPay.toLocaleString()} Only</span>
+                  <span className="text-[10px] text-slate-400 font-bold block mt-0.5">Kyat {payslipData.payDetail.netPay.toLocaleString()} Only</span>
                 </div>
               </div>
 

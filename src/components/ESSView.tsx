@@ -721,7 +721,7 @@ export default function ESSView({
                 <FileCheck className="w-5 h-5 text-blue-600" />
                 <div>
                   <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wide">Deep Research Compliance & Portal Requirements Checklist</h3>
-                  <p className="text-slate-400 text-[10px] font-medium mt-0.5">Verification list compiled from Indian statutory and Zoho Payroll product audits</p>
+                  <p className="text-slate-400 text-[10px] font-medium mt-0.5">Verification list compiled from Myanmar statutory and Zoho Payroll product audits</p>
                 </div>
               </div>
 
@@ -1577,7 +1577,7 @@ export default function ESSView({
         </div>
       )}
 
-      {/* HIGHER-FIDELITY INDIAN PAYSLIP VISUAL MODAL */}
+      {/* HIGHER-FIDELITY MYANMAR PAYSLIP VISUAL MODAL */}
       {showPayslipId && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-slate-300 w-full max-w-3xl rounded-xl overflow-hidden shadow-2xl flex flex-col h-[90vh]">
